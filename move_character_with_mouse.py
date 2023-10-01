@@ -9,18 +9,14 @@ TUK_ground = load_image('TUK_GROUND.png')
 character = load_image('animation_sheet.png')
 cursor = load_image('hand_arrow.png')
 
-def moving_character(character_x, character_y, cursor_x, cursor_y):
-    dir_x = cursor_x - character_x
-    dir_y = cursor_y - character_y
+def moving_character(character_x, character_y, cursor_x, cursor_y, t):
     move_speed = 5
-    distance = math.sqrt(dir_x ** 2 + dir_y ** 2)
-    if distance > move_speed:
-        dir_x /= distance
-        dir_y /= distance
-        character_x += dir_x * move_speed
-        character_y += dir_y * move_speed
+    character_x = lerp(character_x, cursor_x, t)
+    character_y = lerp(character_y, cursor_y, t)
+    return character_x, character_y, cursor_x, cursor_y
 
-    return character_x, character_y, dir_x, dir_y
+def lerp(start, end, t):
+    return start + (end - start) * t
 
 def random_xy():
     return random.randint(0, TUK_WIDTH - 1), random.randint(0, TUK_HEIGHT - 1)
@@ -35,9 +31,10 @@ character_direction = 0
 while running:
     clear_canvas()
     TUK_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
+    t=0.1
     cursor.draw(cursor_x, cursor_y)
-    character_x, character_y, dir_x, dir_y = moving_character(character_x, character_y, cursor_x, cursor_y)
-    if dir_x > 0:
+    character_x, character_y, dir_x, dir_y = moving_character(character_x, character_y, cursor_x, cursor_y,t)
+    if character_x < cursor_x:
         character_direction = 1
     else:
         character_direction = 0
@@ -48,6 +45,6 @@ while running:
     distance_to_target = math.sqrt((character_x - cursor_x) ** 2 + (character_y - cursor_y) ** 2)
     if distance_to_target < 5:
         cursor_x, cursor_y = random_xy()
-    delay(0.009)
+    delay(0.03)
 
 close_canvas()
